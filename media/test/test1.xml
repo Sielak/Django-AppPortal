@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pdf2xml SYSTEM "pdf2xml.dtd">
+
+<pdf2xml producer="poppler" version="0.68.0">
+<page number="1" position="absolute" top="0" left="0" height="1263" width="892">
+	<fontspec id="0" size="11" family="Helvetica" color="#000000"/>
+	<fontspec id="1" size="18" family="Helvetica" color="#000000"/>
+	<fontspec id="2" size="11" family="Helvetica" color="#000000"/>
+	<fontspec id="3" size="8" family="Helvetica" color="#000000"/>
+	<fontspec id="4" size="8" family="Helvetica" color="#000000"/>
+<text top="107" left="89" width="99" height="12" font="0"><b>ICA Sverige AB</b></text>
+<text top="125" left="89" width="52" height="12" font="0"><b>Box 830</b></text>
+<text top="143" left="89" width="98" height="12" font="0"><b>72184 Västerås</b></text>
+<text top="95" left="491" width="121" height="19" font="1"><b>Inköpsorder</b></text>
+<text top="161" left="491" width="69" height="12" font="2">2019-05-28</text>
+<text top="359" left="491" width="198" height="12" font="2">Fritt fabrik, frakt tillkommer          </text>
+<text top="161" left="850" width="8" height="12" font="2">1</text>
+<text top="413" left="491" width="88" height="12" font="2">45 dagar netto</text>
+<text top="161" left="652" width="65" height="12" font="2">5787-8977</text>
+<text top="161" left="753" width="60" height="12" font="2">IO535036</text>
+<text top="143" left="491" width="42" height="12" font="0"><b>Datum</b></text>
+<text top="143" left="652" width="83" height="12" font="0"><b>Leverantörnr</b></text>
+<text top="143" left="762" width="50" height="12" font="0"><b>Ordernr</b></text>
+<text top="143" left="829" width="29" height="12" font="0"><b>Sida</b></text>
+<text top="216" left="89" width="79" height="10" font="3"><b>Leveransadress</b></text>
+<text top="216" left="491" width="35" height="10" font="3"><b>Adress</b></text>
+<text top="342" left="89" width="55" height="10" font="3"><b>Er referens</b></text>
+<text top="342" left="491" width="76" height="10" font="3"><b>Leveransvillkor</b></text>
+<text top="396" left="89" width="61" height="10" font="3"><b>Vår referens</b></text>
+<text top="396" left="286" width="76" height="10" font="3"><b>Leveransdatum</b></text>
+<text top="396" left="491" width="83" height="10" font="3"><b>Betalningsvillkor</b></text>
+<text top="305" left="89" width="76" height="12" font="2">9691582008</text>
+<text top="288" left="89" width="60" height="10" font="3"><b>Momsreg.nr</b></text>
+<text top="269" left="89" width="89" height="12" font="2">44351 LERUM</text>
+<text top="251" left="89" width="74" height="12" font="2">Hulans Torg</text>
+<text top="287" left="491" width="151" height="12" font="2">13126  NACKA STRAND</text>
+<text top="251" left="491" width="49" height="12" font="2">Box 118</text>
+<text top="233" left="89" width="122" height="12" font="2">ICA Kvantum Lerum</text>
+<text top="233" left="491" width="130" height="12" font="2">HL Display Nordic AB</text>
+<text top="342" left="286" width="57" height="10" font="3"><b>Godsmärke</b></text>
+<text top="359" left="286" width="61" height="12" font="2">Affärschef</text>
+<text top="413" left="89" width="170" height="12" font="2">P02AHE/Anneli Helmersson</text>
+<text top="342" left="759" width="64" height="10" font="3"><b>Leverantörnr</b></text>
+<text top="359" left="759" width="65" height="12" font="2">5787-8977</text>
+<text top="468" left="188" width="77" height="12" font="0"><b>Beskrivning</b></text>
+<text top="468" left="89" width="15" height="12" font="0"><b>Nr</b></text>
+<text top="468" left="484" width="34" height="12" font="0"><b>Antal</b></text>
+<text top="468" left="580" width="4" height="12" font="0"><b> </b></text>
+<text top="468" left="658" width="93" height="12" font="0"><b>A-pris Rabatt</b></text>
+<text top="468" left="803" width="46" height="12" font="0"><b>Belopp</b></text>
+<text top="486" left="89" width="766" height="10" font="4">_____________________________________________________________________________________________________________________________________</text>
+<text top="503" left="188" width="176" height="12" font="2">Hållare QR-kod modell höger</text>
+<text top="503" left="662" width="34" height="12" font="2">73,60</text>
+<text top="503" left="89" width="45" height="12" font="2">552669</text>
+<text top="503" left="814" width="34" height="12" font="2">73,60</text>
+<text top="503" left="527" width="13" height="12" font="2">St</text>
+<text top="503" left="510" width="8" height="12" font="2">1</text>
+<text top="521" left="188" width="187" height="12" font="2">ICA HOLDER 154-87-154 DPS</text>
+<text top="574" left="563" width="68" height="12" font="2">25% Moms</text>
+<text top="556" left="563" width="64" height="12" font="0"><b>Total SEK</b></text>
+<text top="592" left="563" width="64" height="12" font="0"><b>Total SEK</b></text>
+<text top="592" left="814" width="34" height="12" font="0"><b>92,00</b></text>
+<text top="574" left="814" width="34" height="12" font="2">18,40</text>
+<text top="556" left="814" width="34" height="12" font="0"><b>73,60</b></text>
+<text top="1121" left="89" width="314" height="12" font="2">Er faktura skall referera till vårt beställningsnummer.</text>
+<text top="1139" left="89" width="308" height="12" font="2">Fakturan skall ställas till nedanstående postadress.</text>
+<text top="1193" left="750" width="65" height="12" font="2">5095-0781</text>
+<text top="1176" left="482" width="85" height="10" font="3"><b>Momsreg.nr/Säte</b></text>
+<text top="1193" left="482" width="109" height="12" font="2">SE556021026101</text>
+<text top="1193" left="339" width="128" height="12" font="2">0771-510 100 -&gt;1-&gt;4</text>
+<text top="1176" left="339" width="100" height="10" font="3"><b>Telefon/fax/hemsida</b></text>
+<text top="1193" left="625" width="65" height="12" font="2">1695508-0</text>
+<text top="1176" left="625" width="42" height="10" font="3"><b>Plusgiro</b></text>
+<text top="1176" left="750" width="45" height="10" font="3"><b>Bankgiro</b></text>
+<text top="1176" left="89" width="56" height="10" font="3"><b>Postadress</b></text>
+<text top="1158" left="89" width="766" height="10" font="4">_____________________________________________________________________________________________________________________________________</text>
+<text top="1230" left="625" width="150" height="10" font="4">Företaget innehar F-skattesedel.</text>
+<text top="1211" left="89" width="156" height="12" font="2">72184 Västerås                </text>
+<text top="1193" left="89" width="136" height="12" font="2">Box 830                       </text>
+</page>
+</pdf2xml>

@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <title>PMO Reporting</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static 'css/custom2.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static '/css/dataTables.bootstrap4.min.css' %}">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+</head>
+<body>
+  <!-- Modal -->
+  <div class="modal fade bd-example-modal-lg" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Update row</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form method="post">
+            {% csrf_token %}
+            <div class="container-fluid">
+              <div class="row">
+                <div class="col-md-6 ml-auto">
+                  <div class="form-group">
+                    <label for="modal_Location">Location</label>
+                    <select class="form-control" id="modal_Location" name="modal_Location">
+                      <option value="Sundsvall">Sundsvall</option>
+                      <option value="Gliwice">Gliwice</option>
+                      <option value="Harlow">Harlow</option>
+                      <option value="Tours">Tours</option>
+                      <option value="Suzhou">Suzhou</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="modal_Location_type">Location Type</label>
+                    <select class="form-control" id="modal_Location_type" name="modal_Location_type">
+                      <option value="Factory">Factory</option>
+                      <option value="Hub">Hub</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="modal_initiative_type">Initiative Type</label>
+                    <select class="form-control" id="modal_initiative_type" name="modal_initiative_type">
+                      <option value="Efficiency">Efficiency</option>
+                      <option value="Purchasing">Purchasing</option>
+                      <option value="Traded">Traded</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="modal_category">Category</label>
+                    <select class="form-control" id="modal_category" name="modal_category">
+                      {% for item in category_list %}
+                      <option value="{{ item.id }}">{{ item }}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="modal_sub_category">Sub Category</label>
+                    <select class="form-control" id="modal_sub_category" name="modal_sub_category">
+                      {% for item in subcategory_list %}
+                      <option value="{{ item.id }}">{{ item }}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="modal_initiative_product">Initiative / Product</label>
+                    <input type="text" class="form-control" id="modal_initiative_product" name="modal_initiative_product">
+                  </div>
+                  <div class="form-group">
+                    <label for="modal_status">Status</label>
+                    <select class="form-control" id="modal_status" name="modal_status">
+                      <option value="Not Initiated">Not Initiated</option>
+                      <option value="On track">On track</option>
+                      <option value="Confirmed">Confirmed</option>
+                      <option value="Delayed">Delayed</option>
+                      <option value="Cancelled">Cancelled</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="modal_deadline">Savings start date</label>
+                    <input type="date" class="form-control" id="modal_deadline" name="modal_deadline">
+                  </div>
+                  <div class="form-group">
+                    <label for="yearly_savings">
+                      Yearly savings
+                      <a href="#" data-toggle="tooltip" title="" data-original-title="Use this to update all budget months at once">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="blue" class="bi bi-info-circle" viewBox="0 0 16 16">
+                          <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                          <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                        </svg>
+                      </a>
+                    </label>
+                    <input type="number" step="0.01" min=0 class="form-control" id="yearly_savings" name="yearly_savings">
+                  </div>
+                </div>
+                <div class="col-md-6 ml-auto">
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th scope="col">Month</th>
+                        <th scope="col">Budget</th>
+                        <th scope="col">Actual</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <th scope="row">January</th>
+                        <td>
+                          <input type="text" id="budget_01" name="budget_01" class="form-control">
+                        </td>
+                        <td>
+                          <input type="text" id="actual_01" name="actual_01" class="form-control">
+                        </td>
+                      </tr>
+                      <tr>
+                        <th scope="row">February</th>
+                        <td>
+                          <input type="text" id="budget_02" name="budget_02" class="form-control">
+                        </td>
+                        <td>
+                          <input type="text" id="actual_02" name="actual_02" class="form-control">
+                        </td>
+                      </tr>
+                      <tr>
+                        <th scope="row">March</th>
+                        <td>
+                          <input type="text" id="budget_03" name="budget_03" class="form-control">
+                        </td>
+                        <td>
+                          <input type="text" id="actual_03" name="actual_03" class="form-control">
+                        </td>
+                      </tr>
+                      <tr>
+                        <th scope="row">April</th>
+                        <td>
+                          <input type="text" id="budget_04" name="budget_04" class="form-control">
+                        </td>
+                        <td>
+                          <input type="text" id="actual_04" name="actual_04" class="form-control">
+                        </td>
+                      </tr>
+                      <tr>
+                        <th scope="row">May</th>
+                        <td>
+                          <input type="text" id="budget_05" name="budget_05" class="form-control">
+                        </td>
+                        <td>
+                          <input type="text" id="actual_05" name="actual_05" class="form-control">
+                        </td>
+                      </tr>
+                      <tr>
+                        <th scope="row">June</th>
+                        <td>
+                          <input type="text" id="budget_06" name="budget_06" class="form-control">
+                        </td>
+                        <td>
+                          <input type="text" id="actual_06" name="actual_06" class="form-control">
+                        </td>
+                      </tr>
+                      <tr>
+                        <th scope="row">July</th>
+                        <td>
+                          <input type="text" id="budget_07" name="budget_07" class="form-control">
+                        </td>
+                        <td>
+                          <input type="text" id="actual_07" name="actual_07" class="form-control">
+                        </td>
+                      </tr>
+                      <tr>
+                        <th scope="row">August</th>
+                        <td>
+                          <input type="text" id="budget_08" name="budget_08" class="form-control">
+                        </td>
+                        <td>
+                          <input type="text" id="actual_08" name="actual_08" class="form-control">
+                        </td>
+                      </tr>
+                      <tr>
+                        <th scope="row">September</th>
+                        <td>
+                          <input type="text" id="budget_09" name="budget_09" class="form-control">
+                        </td>
+                        <td>
+                          <input type="text" id="actual_09" name="actual_09" class="form-control">
+                        </td>
+                      </tr>
+                      <tr>
+                        <th scope="row">October</th>
+                        <td>
+                          <input type="text" id="budget_10" name="budget_10" class="form-control">
+                        </td>
+                        <td>
+                          <input type="text" id="actual_10" name="actual_10" class="form-control">
+                        </td>
+                      </tr>
+                      <tr>
+                        <th scope="row">November</th>
+                        <td>
+                          <input type="text" id="budget_11" name="budget_11" class="form-control">
+                        </td>
+                        <td>
+                          <input type="text" id="actual_11" name="actual_11" class="form-control">
+                        </td>
+                      </tr>
+                      <tr>
+                        <th scope="row">December</th>
+                        <td>
+                          <input type="text" id="budget_12" name="budget_12" class="form-control">
+                        </td>
+                        <td>
+                          <input type="text" id="actual_12" name="actual_12" class="form-control">
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col">
+                  <input type="hidden" id="row_id" name="row_id" value="">
+                  <input type="submit" class="btn btn-success" value="Update" name="Submit"/>
+                  <input type="submit" class="btn btn-warning" value="Copy" name="Submit"/>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="mySidebar" class="sidebar">
+    <div class="card shadow p-3 mb-5 bg-white rounded">
+      <div class="card-body">
+          <h5 class="card-title">
+            <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">
+              <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-box-arrow-left" fill="black" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" d="M6 12.5a.5.5 0 0 0 .5.5h8a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5h-8a.5.5 0 0 0-.5.5v2a.5.5 0 0 1-1 0v-2A1.5 1.5 0 0 1 6.5 2h8A1.5 1.5 0 0 1 16 3.5v9a1.5 1.5 0 0 1-1.5 1.5h-8A1.5 1.5 0 0 1 5 12.5v-2a.5.5 0 0 1 1 0v2z"/>
+                <path fill-rule="evenodd" d="M.146 8.354a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L1.707 7.5H10.5a.5.5 0 0 1 0 1H1.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3z"/>
+              </svg>
+            </a>
+          </h5>
+          <p class="card-text">
+            <form method="post">
+              {% csrf_token %}
+              {% if user_group_list|length > 1 %}
+              <div class="form-group">
+                <label for="Location">Location</label>
+                <select class="form-control" id="Location" name="Location">
+                  {% for item in user_group_list %}
+                  <option value="{{ item }}">{{ item }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              {% else %}
+              <input type="hidden" id="Location" name="Location" value="{{ user_group_list.0.Name }}">
+              {% endif %}
+              <div class="form-group">
+                <label for="Location_type">Location Type</label>
+                <select class="form-control" id="Location_type" name="Location_type">
+                  <option value="Factory">Factory</option>
+                  <option value="Hub">Hub</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="initiative_type">Initiative Type</label>
+                <select class="form-control" id="initiative_type" name="initiative_type">
+                  <option value="Efficiency">Efficiency</option>
+                  <option value="Purchasing">Purchasing</option>
+                  <option value="Traded">Traded</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="category">Category</label>
+                <select class="form-control" id="category" name="category">
+                  {% for item in category_list %}
+                  <option value="{{ item.id }}">{{ item }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="sub_category">Sub Category</label>
+                <select class="form-control" id="sub_category" name="sub_category">
+                  {% for item in subcategory_list %}
+                  <option value="{{ item.id }}">{{ item }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="initiative_product">Initiative / Product</label>
+                <input type="text" class="form-control" id="initiative_product" name="initiative_product">
+              </div>
+              <div class="form-group">
+                <label for="status">Status</label>
+                <select class="form-control" id="status" name="status">
+                  <option value="Not Initiated">Not Initiated</option>
+                  <option value="On track">On track</option>
+                  <option value="Confirmed">Confirmed</option>
+                  <option value="Delayed">Delayed</option>
+                  <option value="Cancelled">Cancelled</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="deadline">Savings start date</label>
+                <input type="date" class="form-control" id="deadline" name="deadline">
+              </div>
+              <div class="form-group">
+                <label for="initiative_year">Initiative year</label>
+                <select class="form-control" id="initiative_year" name="initiative_year">
+                  <option value="2021">2021</option>
+                  <option value="2022">2022</option>
+                  <option value="2023">2023</option>
+                </select>
+              </div>
+              <input type="submit" class="btn btn-success" value="Add" name="Submit"/>
+            </form>
+          </p>
+        </div>
+    </div>  
+  </div>
+  <div id="main">
+    <div class="container-fluid">
+      <nav class="navbar navbar-expand-lg navbar navbar-custom">
+        <a class="navbar-brand" href="#">PMO Reporting APP</a>
+        <ul class="nav">
+          <li class="nav-item">
+            <div class="input-group">
+              <button class="btn btn-success" onclick="openNav()">Add new action</button>
+            </div>
+          </li>
+        </ul>
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Year">
+              <svg width="25" height="25" viewBox="0 0 16 16" class="bi bi-calendar-check" fill="white" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
+                <path fill-rule="evenodd" d="M10.854 7.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7.5 9.793l2.646-2.647a.5.5 0 0 1 .708 0z"/>
+              </svg>
+            </a>
+            <div class="dropdown-menu dropdown-menu-right">
+              <a class="dropdown-item" href="{% url 'main_pmoReporting' %}?year=2021">2021</a>
+              <a class="dropdown-item" href="{% url 'main_pmoReporting' %}?year=2022">2022</a>
+              <a class="dropdown-item" href="{% url 'main_pmoReporting' %}?year=2023">2023</a>
+            </div>
+          </li> 
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="User">
+              <svg width="25" height="25" viewBox="0 0 16 16" class="bi bi-person-circle" fill="white" xmlns="http://www.w3.org/2000/svg">
+                <path d="M13.468 12.37C12.758 11.226 11.195 10 8 10s-4.757 1.225-5.468 2.37A6.987 6.987 0 0 0 8 15a6.987 6.987 0 0 0 5.468-2.63z"/>
+                <path fill-rule="evenodd" d="M8 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+                <path fill-rule="evenodd" d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zM0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8z"/>
+              </svg>
+            </a>
+            <div class="dropdown-menu dropdown-menu-right">
+              <h6 class="dropdown-header">Hi, {{ request.user }}.</h6>  
+              <a class="dropdown-item" href="{% url 'admin:index' %}">Admin Panel</a>
+              <a class="dropdown-item" href="{% url 'logout_pmoReporting' %}">Sign Out</a>
+            </div>
+          </li>
+          <li class="nav-item">
+            <p></p>
+          </li>
+      </ul> 
+      </nav>
+      <div class="row">
+        <div class="col">
+          <br>
+        </div>
+      </div> 
+      <div class="row">
+        <div class="col">
+          <div class="card shadow p-3 mb-5 bg-white rounded">
+            <div class="card-body">
+              <h5 class="card-title">Action List for {{choosed_year}}</h5>
+              <p class="card-text">
+                <table id="resultsALL" class="table table-striped table-bordered" width="100%">
+                <thead>
+                  <tr>
+                    <th>Location</th>
+                    <th>Location Type</th>
+                    <th>Initiative Type</th>
+                    <th>Category</th>
+                    <th>Sub-category</th>
+                    <th>Initiative / Product</th>
+                    <th>Status</th>
+                    <th>Last Savings Actual</th>
+                    <th>Last Savings Budget</th>
+                    <th>Total Savings Actual</th>
+                    <th>Total Savings Budget</th>
+                    <th>Savings start date</th>
+                    <th>Edit</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for item in pmo_data %}
+                  <tr>
+                    <td>{{ item.location }}</td>
+                    <td>{{ item.location_type }}</td>
+                    <td>{{ item.initiative_type }}</td>
+                    <td>{{ item.category }}</td>
+                    <td>{{ item.subcategory }}</td>
+                    <td>{{ item.initiative_product }}</td>
+                    <td>{{ item.status }}</td>
+                    {% if item.last_month_data.0 == 0.0 %}
+                    <td>TBD</td>
+                    {% else %}
+                    <td>{{ item.last_month_data.0 }}</td>
+                    {% endif %}
+                    <td>{{ item.last_month_data.1 }}</td>
+                    <td>{{ item.total_savings_actual }}</td>
+                    <td>{{ item.total_savings_budget }}</td>
+                    <td>{{ item.implementation_deadline|date:'Y-m-d' }}</td>
+                    <td>
+                      <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#exampleModal"
+                        data-text1="{{ item.location }}" data-text2="{{ item.location_type }}"
+                        data-text3="{{ item.initiative_type }}" data-text4="{{ item.category.id }}"
+                        data-text5="{{ item.subcategory.id }}" data-text6="{{ item.initiative_product }}"
+                        data-text7="{{ item.status }}" data-text8="{{ item.implementation_deadline|date:'Y-m-d' }}" 
+                        data-text9="" data-text10="{{ item.id }}"
+                        data-text11="{{ item.actual_01 }}" data-text12="{{ item.actual_02 }}"
+                        data-text13="{{ item.actual_03 }}" data-text14="{{ item.actual_04 }}"
+                        data-text15="{{ item.actual_05 }}" data-text16="{{ item.actual_06 }}"
+                        data-text17="{{ item.actual_07 }}" data-text18="{{ item.actual_08 }}"
+                        data-text19="{{ item.actual_09 }}" data-text20="{{ item.actual_10 }}"
+                        data-text21="{{ item.actual_11 }}" data-text22="{{ item.actual_12 }}"
+                        data-text23="{{ item.budget_01 }}" data-text24="{{ item.budget_02 }}"
+                        data-text25="{{ item.budget_03 }}" data-text26="{{ item.budget_04 }}"
+                        data-text27="{{ item.budget_05 }}" data-text28="{{ item.budget_06 }}"
+                        data-text29="{{ item.budget_07 }}" data-text30="{{ item.budget_08 }}"
+                        data-text31="{{ item.budget_09 }}" data-text32="{{ item.budget_10 }}"
+                        data-text33="{{ item.budget_11 }}" data-text34="{{ item.budget_12 }}"
+                        >
+                        Edit
+                      </button>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+/* Set the width of the sidebar to 250px and the left margin of the page content to 250px */
+function openNav() {
+  document.getElementById("mySidebar").style.width = "350px";
+  document.getElementById("main").style.marginLeft = "350px";
+}
+
+/* Set the width of the sidebar to 0 and the left margin of the page content to 0 */
+function closeNav() {
+  document.getElementById("mySidebar").style.width = "0";
+  document.getElementById("main").style.marginLeft = "0";
+}
+</script>
+<script>
+  $('#exampleModal').on('show.bs.modal', function (event) {
+    var button = $(event.relatedTarget) // Button that triggered the modal
+    var text1 = button.data('text1') // Extract info from data-* attributes
+    var text2 = button.data('text2') // Extract info from data-* attributes
+    var text3 = button.data('text3') // Extract info from data-* attributes
+    var text4 = button.data('text4') // Extract info from data-* attributes
+    var text5 = button.data('text5') // Extract info from data-* attributes
+    var text6 = button.data('text6') // Extract info from data-* attributes
+    var text7 = button.data('text7') // Extract info from data-* attributes
+    var text8 = button.data('text8') // Extract info from data-* attributes
+    var text9 = button.data('text9') // Extract info from data-* attributes
+    var text10 = button.data('text10') // Extract info from data-* attributes
+    var text11 = button.data('text11') // Extract info from data-* attributes
+    var text12 = button.data('text12') // Extract info from data-* attributes
+    var text13 = button.data('text13') // Extract info from data-* attributes
+    var text14 = button.data('text14') // Extract info from data-* attributes
+    var text15 = button.data('text15') // Extract info from data-* attributes
+    var text16 = button.data('text16') // Extract info from data-* attributes
+    var text17 = button.data('text17') // Extract info from data-* attributes
+    var text18 = button.data('text18') // Extract info from data-* attributes
+    var text19 = button.data('text19') // Extract info from data-* attributes
+    var text20 = button.data('text20') // Extract info from data-* attributes
+    var text21 = button.data('text21') // Extract info from data-* attributes
+    var text22 = button.data('text22') // Extract info from data-* attributes
+    var text23 = button.data('text23') // Extract info from data-* attributes
+    var text24 = button.data('text24') // Extract info from data-* attributes
+    var text25 = button.data('text25') // Extract info from data-* attributes
+    var text26 = button.data('text26') // Extract info from data-* attributes
+    var text27 = button.data('text27') // Extract info from data-* attributes
+    var text28 = button.data('text28') // Extract info from data-* attributes
+    var text29 = button.data('text29') // Extract info from data-* attributes
+    var text30 = button.data('text30') // Extract info from data-* attributes
+    var text31 = button.data('text31') // Extract info from data-* attributes
+    var text32 = button.data('text32') // Extract info from data-* attributes
+    var text33 = button.data('text33') // Extract info from data-* attributes
+    var text34 = button.data('text34') // Extract info from data-* attributes
+    // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+    // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+    var modal = $(this)
+    modal.find('#modal_Location').val(text1)
+    modal.find('#modal_Location_type').val(text2)
+    modal.find('#modal_initiative_type').val(text3)
+    modal.find('#modal_category').val(text4)
+    modal.find('#modal_sub_category').val(text5)
+    modal.find('#modal_initiative_product').val(text6)
+    modal.find('#modal_status').val(text7)
+    modal.find('#modal_deadline').val(text8)
+    modal.find('#row_id').val(text10)
+    modal.find('#actual_01').val(text11)
+    modal.find('#actual_02').val(text12)
+    modal.find('#actual_03').val(text13)
+    modal.find('#actual_04').val(text14)
+    modal.find('#actual_05').val(text15)
+    modal.find('#actual_06').val(text16)
+    modal.find('#actual_07').val(text17)
+    modal.find('#actual_08').val(text18)
+    modal.find('#actual_09').val(text19)
+    modal.find('#actual_10').val(text20)
+    modal.find('#actual_11').val(text21)
+    modal.find('#actual_12').val(text22)
+    modal.find('#budget_01').val(text23)
+    modal.find('#budget_02').val(text24)
+    modal.find('#budget_03').val(text25)
+    modal.find('#budget_04').val(text26)
+    modal.find('#budget_05').val(text27)
+    modal.find('#budget_06').val(text28)
+    modal.find('#budget_07').val(text29)
+    modal.find('#budget_08').val(text30)
+    modal.find('#budget_09').val(text31)
+    modal.find('#budget_10').val(text32)
+    modal.find('#budget_11').val(text33)
+    modal.find('#budget_12').val(text34)
+  })
+</script>
+<script src="{% static '/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static '/js/dataTables.bootstrap4.min.js' %}"></script>
+<script>
+  $(document).ready(function() {
+      $('#resultsALL').DataTable( {
+          "pageLength": 10,
+          "order": [[ 1, "asc" ], [ 2, "asc" ]],
+          "lengthMenu": [ 5, 10, 25, 50, 75, 100 ]
+      } );
+  } );
+</script>
+<script>
+  $(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+})
+</script>
+</body>
+</html>

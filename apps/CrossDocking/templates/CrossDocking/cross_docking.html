@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <title>Cross Docking</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static 'css/custom2.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static '/css/dataTables.bootstrap4.min.css' %}">   
+    <link rel="stylesheet" href="https://res.cloudinary.com/dxfq3iotg/raw/upload/v1569006288/BBBootstrap/choices.min.css?version=7.0.0">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+    <script src="https://res.cloudinary.com/dxfq3iotg/raw/upload/v1569006273/BBBootstrap/choices.min.js?version=7.0.0"></script>
+</head>
+<body>
+  <!-- Modal edit row-->
+  <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Update row</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form method="post">
+            {% csrf_token %}
+            <div class="row">
+              <div class="col">
+                <div class="form-group">
+                  <label for="modal_po_number">PO number</label>
+                  <input type="text" class="form-control" id="modal_po_number" name="modal_po_number" disabled>
+                </div>
+                <div class="form-group">
+                  <label for="modal_pallet_count">Pallets</label>
+                  <input type="number" class="form-control" id="modal_pallet_count" name="modal_pallet_count">
+                </div>
+                <div class="form-group">
+                  <label for="modal_pallet_location">Pallets Location</label>
+                  <textarea class="form-control" id="modal_pallet_location" name="modal_pallet_location" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                  <label for="modal_packages_count">Packages</label>
+                  <input type="number" class="form-control" id="modal_packages_count" name="modal_packages_count">
+                </div>
+                <div class="form-group">
+                  <label for="modal_weight">weight</label>
+                  <input type="number" step="0.01" class="form-control" id="modal_weight" name="modal_weight">
+                </div>
+              </div>
+              <div class="col">
+                <div class="form-group">
+                  <label for="modal_po_status">PO Status</label>
+                  <input type="text" class="form-control" id="modal_po_status" name="modal_po_status" disabled>
+                </div>
+                <div class="form-group">
+                  <label for="modal_delivery_number_readonly">Delivery number</label>
+                  <input type="text" class="form-control" id="modal_delivery_number_readonly" name="modal_delivery_number_readonly" disabled>
+                </div>
+                <div class="form-group">
+                  <label for="modal_Status">Status</label>
+                  <select class="form-control" id="modal_Status" name="modal_Status">
+                    <option selected>Waiting for delivery</option>
+                    <option>Delivered to GLI RDC</option>
+                    <option>Sent to SDL RDC</option>
+                    <option>Delivered to SDL RDC</option>
+                    <option>On hold</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="delivery_date">Deliver to gliwice 1810</label>
+                  <input type="date" class="form-control" id="delivery_date" name="delivery_date">
+                </div>
+                <div class="form-group">
+                  <label for="shipment_date">Shipment to 1210</label>
+                  <input type="date" class="form-control" id="shipment_date" name="shipment_date">
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col">
+                <div class="input-group mb-3">
+                  <input type="hidden" id="row_id" name="row_id" value="">
+                  <input type="hidden" id="modal_delivery_number" name="modal_delivery_number" value="">
+                  <input type="submit" class="btn btn-success" value="Update" name="Submit"/>
+                  <input type="text" name="backorder_number" class="form-control" placeholder="Backorder number" aria-label="Backorder number" aria-describedby="basic-addon2">
+                  <div class="input-group-append">
+                    <input type="submit" class="btn btn-outline-danger" value="Split" name="Submit"/>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Modal 2 new delivery -->
+  <div class="modal fade" id="exampleModal2" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel2" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel2">Create new CMR</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+              <label for="modal2_load_date">Load Date</label>
+              <input type="date" class="form-control" id="modal2_load_date" name="modal2_load_date" required>
+            </div>
+            <div class="form-group">
+              <input type="text" placeholder="Carrier Name" class="form-control" id="modal2_name" name="modal2_name" maxlength="40">
+            </div>
+            <div class="form-group">
+              <input type="text" placeholder="Carrier Address" class="form-control" id="modal2_address" name="modal2_address" maxlength="40">
+            </div>
+            <div class="form-group">
+              <input type="text" placeholder="Carrier Country" class="form-control" id="modal2_country" name="modal2_country" maxlength="40">
+            </div>
+            <div class="form-group">
+              <input type="text" placeholder="Vehicle number" class="form-control" id="modal2_vehicle_number" name="modal2_vehicle_number" maxlength="10" required>
+            </div>
+            <div class="form-group">
+              <input type="text" placeholder="Trailer number" class="form-control" id="modal2_trailer_number" name="modal2_trailer_number" maxlength="10" required>
+            </div>
+            <div class="form-group">
+              <select id="choices-multiple-remove-button" name="modal2_po_list" placeholder="PO numbers (max 16)" multiple>
+                {% for item in po_numbers_list %}
+                <option value="{{ item }}">{{ item }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <!-- <input type="submit" class="btn btn-success" value="Create" name="Submit" onClick="window.location.reload();"/> -->
+            <button type="submit" id="myBtn" class="btn btn-success" value="Create" name="Submit" onClick="window.location.reload();">Create</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Modal 3 upload file -->
+  <div class="modal fade" id="exampleModal3" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel3" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel3">Upload CMR</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group">
+              <label for="myfile">Choose signed CMR file</label>
+              <input type="file" class="form-control-file" id="myfile" name="myfile" required>
+            </div>
+            <div class="form-group">
+              <select id="choices-multiple-remove-button" name="modal3_delivery_list" placeholder="Delivery number" required>
+                <option value="" selected disabled hidden>Choose here</option>
+                {% for item in delivery_list %}
+                <option value="{{ item }}">{{ item }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <input type="submit" class="btn btn-success" value="Upload" name="Submit"/>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="main">
+    <div class="container-fluid">
+      <nav class="navbar navbar-expand-lg navbar navbar-dark bg-secondary">
+        <a class="navbar-brand" href="#">Cross Docking</a>
+        <ul class="nav">
+          <li class="nav-item">
+            <form method="post" class="form-inline">
+              {% csrf_token %}
+              <input type="hidden" id="Refresh" name="Submit" value="Refresh">
+              <button class="btn btn-success my-2 my-sm-0" type="submit">Refresh</button>
+            </form>
+          </li>
+          <li class="nav-item">
+            <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#exampleModal2">
+              Create New CMR
+            </button>
+          </li>
+          <li class="nav-item">
+            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#exampleModal3">
+              Upload CMR File
+            </button>
+          </li>
+        </ul>
+        <ul class="navbar-nav ml-auto"> 
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="User">
+              <svg width="25" height="25" viewBox="0 0 16 16" class="bi bi-person-circle" fill="white" xmlns="http://www.w3.org/2000/svg">
+                <path d="M13.468 12.37C12.758 11.226 11.195 10 8 10s-4.757 1.225-5.468 2.37A6.987 6.987 0 0 0 8 15a6.987 6.987 0 0 0 5.468-2.63z"/>
+                <path fill-rule="evenodd" d="M8 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+                <path fill-rule="evenodd" d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zM0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8z"/>
+              </svg>
+            </a>
+            <div class="dropdown-menu dropdown-menu-right">
+              <h6 class="dropdown-header">Hi, {{ request.user }}.</h6>  
+              <a class="dropdown-item" href="{% url 'admin:index' %}">Admin Panel</a>
+              <a class="dropdown-item" href="{% url 'logout_crossDocking' %}">Sign Out</a>
+            </div>
+          </li>
+          <li class="nav-item">
+            <p></p>
+          </li>
+      </ul> 
+      </nav>
+      <div class="row">
+        <div class="col">
+          <br>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col">
+          <div class="card-deck">
+            <div class="card shadow p-3 mb-5 bg-white rounded text-center">
+              <div class="card-body">
+                {% if sum_pallet_count is None %}
+                <h5 class="card-title">Pallet count: 0 pcs</h5>
+                {% else %}
+                <h5 class="card-title">Pallet count: {{ sum_pallet_count }} pcs</h5>
+                {% endif %}
+                {% if sum_pallet_count is None %}
+                <h5 class="card-title">Pallet weight: 0 kg</h5>
+                {% else %}
+                <h5 class="card-title">Pallet weight: {{ sum_weight }} kg</h5>
+                {% endif %}
+              </div>
+            </div>
+            <div class="card shadow p-3 mb-5 bg-white rounded text-center">
+              <div class="card-body">
+                {% if sum_pallet_count is None %}
+                <h5 class="card-title">Packages count: 0 pcs</h5>
+                {% else %}
+                <h5 class="card-title">Packages count: {{ sum_packages }} pcs</h5>
+                {% endif %}
+              </div>
+            </div>
+            <div class="card shadow p-3 mb-5 bg-white rounded text-center">
+              <div class="card-body">
+                <h5 class="card-title">Last month price: {{ last_month_price }} PLN</h5>
+              </div>
+            </div>
+            <div class="card shadow p-3 mb-5 bg-white rounded text-center">
+              <div class="card-body">
+                <table cellpadding="3" cellspacing="0" border="0">
+                    <tr id="filter_col10" data-column="9">
+                        <td align="center"><input type="text" placeholder="In Date Filter" class="column_filter" id="col9_filter"></td>
+                    </tr>
+                    <tr id="filter_col11" data-column="10">
+                        <td align="center"><input type="text" placeholder="Out Date Filter" class="column_filter" id="col10_filter"></td>
+                    </tr>
+              </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col">
+          <div class="card shadow p-3 mb-5 bg-white rounded">
+            <div class="card-body">
+              <p class="card-text">
+                <table id="resultsALL" class="table table-striped table-bordered" width="100%">
+                <thead>
+                  <tr>
+                    <th>PO no.</th>
+                    <th>PO Status</th>
+                    <th>Supplier</th>
+                    <th>Price</th>
+                    <th>Pallets</th>
+                    <th>Packages</th>
+                    <th>Delivery number</th>
+                    <th>Gliwice RDC status</th>
+                    <th>Conf Date</th>
+                    <th>In Date</th>
+                    <th>Out Date</th>
+                    <th>
+                      <svg width="20" height="20" viewBox="0 0 16 16" class="bi bi-paperclip" fill="black" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" d="M4.5 3a2.5 2.5 0 0 1 5 0v9a1.5 1.5 0 0 1-3 0V5a.5.5 0 0 1 1 0v7a.5.5 0 0 0 1 0V3a1.5 1.5 0 1 0-3 0v9a2.5 2.5 0 0 0 5 0V5a.5.5 0 0 1 1 0v7a3.5 3.5 0 1 1-7 0V3z"/>
+                      </svg>
+                    </th>
+                    <th>Edit</th>
+                    <th>Bin</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for item in po_list %}
+                  <tr>
+                    <td>{{ item.po_number }}</td>
+                    <td>{{ item.po_status }}</td>
+                    <td>{{ item.po_supplier }}</td>
+                    <td>{{ item.calculate_price }} PLN</td>
+                    {% if item.pallet_count is None %}
+                    <td></td>
+                    {% else %}
+                    <td>{{ item.pallet_count }}</td>
+                    {% endif %}
+                    {% if item.packages is None %}
+                    <td></td>
+                    {% else %}
+                    <td>{{ item.packages }}</td>
+                    {% endif %}
+                    {% if item.delivery_number == '' %}
+                    <td></td>
+                    {% else %}
+                    <td>{{ item.delivery_number }}</td>
+                    {% endif %}
+                    {% if item.row_status == '' %}
+                    <td></td>
+                    {% else %}
+                    <td>{{ item.row_status }}</td>
+                    {% endif %}
+                    {% if item.delayed_delivery is True %}
+                    <td style="color:red">{{ item.confirmation_date|date:'Y-m-d' }}</td>
+                    {% else %}
+                    <td>{{ item.confirmation_date|date:'Y-m-d' }}</td>
+                    {% endif %}
+                    <td>{{ item.delivery_date|date:'Y-m-d' }}</td>
+                    <td>{{ item.shipment_date|date:'Y-m-d' }}</td>
+                    {% if item.file_uploaded is False %}
+                    <td></td>
+                    {% else %}
+                    <td>
+                      <!-- <a href="{% static '/' %}CMR_{{ item.delivery_number }}.pdf" target="_blank"> -->
+                      <a href="{% static '/CrossDocking/' %}{{location}}/CMR_{{ item.delivery_number }}.pdf" target="_blank">
+                        <svg width="20" height="20" viewBox="0 0 16 16" class="bi bi-paperclip" fill="black" xmlns="http://www.w3.org/2000/svg">
+                          <path fill-rule="evenodd" d="M4.5 3a2.5 2.5 0 0 1 5 0v9a1.5 1.5 0 0 1-3 0V5a.5.5 0 0 1 1 0v7a.5.5 0 0 0 1 0V3a1.5 1.5 0 1 0-3 0v9a2.5 2.5 0 0 0 5 0V5a.5.5 0 0 1 1 0v7a3.5 3.5 0 1 1-7 0V3z"/>
+                        </svg>
+                      </a>
+                    </td>
+                    {% endif %}
+                    <td>
+                      <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#exampleModal"
+                        data-text1="{{ item.po_number }}" 
+                        data-text2="{{ item.po_status }}"
+                        {% if item.pallet_count is None %}
+                        data-text3="" 
+                        {% else %}
+                        data-text3="{{ item.pallet_count }}" 
+                        {% endif %}
+                        data-text4="CMR_{{ item.delivery_number }}"
+                        data-text5="{{ item.delivery_number }}" 
+                        data-text6="{{ item.row_status }}"
+                        data-text7="{{ item.id }}" 
+                        data-text8="{{ item.delivery_date|date:'Y-m-d' }}" 
+                        data-text9="{{ item.shipment_date|date:'Y-m-d' }}"
+                        {% if item.packages is None %}
+                        data-text10=""
+                        {% else %}
+                        data-text10="{{ item.packages }}"
+                        {% endif %}
+                        {% if item.pallet_location is None %}
+                        data-text11=""
+                        {% else %}
+                        data-text11="{{ item.pallet_location }}"
+                        {% endif %}
+                        {% if item.weight is None %}
+                        data-text12=""
+                        {% else %}
+                        data-text12="{{ item.weight }}"
+                        {% endif %}
+                        >
+                        Edit
+                      </button>
+                    </td>
+                    <td>{{ item.pallet_location }}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  $('#exampleModal').on('show.bs.modal', function (event) {
+    var button = $(event.relatedTarget) // Button that triggered the modal
+    var text1 = button.data('text1') // Extract info from data-* attributes
+    var text2 = button.data('text2') // Extract info from data-* attributes
+    var text3 = button.data('text3') // Extract info from data-* attributes
+    var text4 = button.data('text4') // Extract info from data-* attributes
+    var text5 = button.data('text5') // Extract info from data-* attributes
+    var text6 = button.data('text6') // Extract info from data-* attributes
+    var text7 = button.data('text7') // Extract info from data-* attributes
+    var text8 = button.data('text8') // Extract info from data-* attributes
+    var text9 = button.data('text9') // Extract info from data-* attributes
+    var text10 = button.data('text10') // Extract info from data-* attributes
+    var text11 = button.data('text11') // Extract info from data-* attributes
+    var text12 = button.data('text12') // Extract info from data-* attributes
+    // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+    // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+    var modal = $(this)
+    modal.find('#modal_po_number').val(text1)
+    modal.find('#modal_po_status').val(text2)
+    modal.find('#modal_pallet_count').val(text3)
+    modal.find('#modal_cmr_number').val(text4)
+    modal.find('#modal_delivery_number').val(text5)
+    modal.find('#modal_delivery_number_readonly').val(text5)
+    modal.find('#modal_Status').val(text6)
+    modal.find('#row_id').val(text7)
+    modal.find('#delivery_date').val(text8)
+    modal.find('#shipment_date').val(text9)
+    modal.find('#modal_packages_count').val(text10)
+    modal.find('#modal_pallet_location').val(text11)
+    modal.find('#modal_weight').val(text12)
+  })
+</script>
+<script src="{% static '/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static '/js/dataTables.bootstrap4.min.js' %}"></script>
+<script> 
+function filterGlobal () {
+    $('#resultsALL').DataTable().search(
+        $('#global_filter').val(),
+        $('#global_regex').prop('checked'),
+        $('#global_smart').prop('checked')
+    ).draw();
+}
+ 
+function filterColumn ( i ) {
+    $('#resultsALL').DataTable().column( i ).search(
+        $('#col'+i+'_filter').val(),
+        $('#col'+i+'_regex').prop('checked'),
+        $('#col'+i+'_smart').prop('checked')
+    ).draw();
+}
+ 
+$(document).ready(function() {
+  $('#resultsALL').DataTable( {
+          "pageLength": 10,
+          "order": [[ 1, "desc" ],[ 8, "asc" ]],
+          "lengthMenu": [ 5, 10, 25, 50, 75, 100 ],
+          "columnDefs": [
+              { "width": "6%", "targets": 0 },
+              { "width": "8%", "targets": 1 },
+              { "width": "12%", "targets": 2 },
+              { "width": "2%", "targets": 11 },
+              { "width": "5%", "targets": 12 },
+              { searchable: true, visible: false, "targets": 13 }
+          ]
+      } );
+ 
+    $('input.global_filter').on( 'keyup click', function () {
+        filterGlobal();
+    } );
+ 
+    $('input.column_filter').on( 'keyup click', function () {
+        filterColumn( $(this).parents('tr').attr('data-column') );
+    } );
+} );
+</script>
+<script>
+  $(document).ready(function(){
+
+var multipleCancelButton = new Choices('#choices-multiple-remove-button', {
+removeItemButton: true,
+maxItemCount:16,
+searchResultLimit:5,
+renderChoiceLimit:5
+});
+
+
+});
+</script>
+<script>
+  document.getElementById("myBtn").addEventListener("click",function () {
+  var timeoutID = window.setTimeout(function () {
+    location.reload();
+  }, 2000);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <title>CAB requests list</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="{% static '/css/dataTables.bootstrap4.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/custom2.css' %}">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+</head>
+<body>
+
+  <!-- Modal -->
+  <div class="modal fade bd-example-modal-lg" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Comment</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <textarea class="form-control" id="modal_comment" name="modal_comment" rows="6" readonly></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Modal -->
+  <div class="modal fade bd-example-modal-lg" id="exampleModal2" tabindex="-1" role="dialog" aria-labelledby="exampleModal2Label" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModal2Label">Description</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <textarea class="form-control" id="modal_description" name="modal_description" rows="6" readonly></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="mySidebar" class="sidebar">
+    <div class="card shadow p-3 mb-5 bg-white rounded">
+      <div class="card-body">
+        <h5 class="card-title">
+          <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">
+            <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-box-arrow-left" fill="black" xmlns="http://www.w3.org/2000/svg">
+              <path fill-rule="evenodd" d="M6 12.5a.5.5 0 0 0 .5.5h8a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5h-8a.5.5 0 0 0-.5.5v2a.5.5 0 0 1-1 0v-2A1.5 1.5 0 0 1 6.5 2h8A1.5 1.5 0 0 1 16 3.5v9a1.5 1.5 0 0 1-1.5 1.5h-8A1.5 1.5 0 0 1 5 12.5v-2a.5.5 0 0 1 1 0v2z"/>
+              <path fill-rule="evenodd" d="M.146 8.354a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L1.707 7.5H10.5a.5.5 0 0 1 0 1H1.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3z"/>
+            </svg>
+          </a>
+        </h5>
+        <p class="card-text">
+          <table cellpadding="3" cellspacing="0" border="0">
+            <tr id="filter_col1" data-column="1">
+                <td align="center"><input type="text" placeholder="Step Filter" class="column_filter" id="col1_filter"></td>
+            </tr>
+            <tr id="filter_col2" data-column="2">
+                <td align="center"><input type="text" placeholder="Stream Filter" class="column_filter" id="col2_filter"></td>
+            </tr>
+          </table>
+        </p>
+      </div>  
+    </div>
+  </div>
+  <div id="main">
+    <div class="container-fluid">
+      <br>
+      <div class="row">
+        <div class="col">
+          <div class="card shadow p-3 mb-5 bg-white rounded">
+            <div class="card-body">
+              <h5 class="card-title">
+                RFC List
+                <button class="btn btn-success" onclick="openNav()">Filters</button>
+              </h5>
+              
+              <p class="card-text">
+                <table id="resultsALL" class="table table-striped table-bordered" width="100%">
+                <thead>
+                  <tr>
+                    <th>id</th>
+                    <th>Step</th>
+                    <th>Stream</th>
+                    <th>Feature no.</th>
+                    <th>Est dev hrs</th>
+                    <th>Est cost (SEK)</th>
+                    <th>Est deliv date</th>
+                    <th>Subject</th>
+                    <th>Company</th>
+                    <th>Comments</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for item in cab_data %}
+                  <tr>
+                    <td>{{ item.id }}</td>
+                    <td>{{ item.step }}</td>
+                    <td>{{ item.stream }}</td>
+                    <td>{{ item.feature }}</td>
+                    <td>{{ item.est_dev_hrs }}</td>
+                    <td>{{ item.est_cost_sek }}</td>
+                    <td>{{ item.est_deliv_date|date:'Y-m-d' }}</td>
+                    <td>{{ item.subject }}</td>
+                    <td>
+                      {% if item.hl_payer_list|length > 1 %}
+                      <ul>
+                        {% for payer in item.hl_payer_list %}
+                        <li>
+                          {{ payer }}
+                        </li>
+                        {% endfor %}
+                      </ul>
+                      {% else %}
+                      {% endif  %}
+                    </td>
+                    <td>
+                      {% if item.comment|length > 1 %}
+                      <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal"
+                        data-text1="{{ item.comment }}">
+                        Comments
+                      </button>
+                      {% else %}
+                      <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#exampleModal"
+                        data-text1="{{ item.comment }}">
+                        Comments
+                      </button>
+                      {% endif  %}
+                      
+                    </td>
+                    <td>
+                      {% if item.description_text|length > 1 %}
+                      <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal2"
+                        data-text1="{{ item.description_text }}">
+                        Description
+                      </button>
+                      {% else %}
+                      <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#exampleModal2"
+                        data-text1="{{ item.description_text }}">
+                        Description
+                      </button>
+                      {% endif  %}
+                      
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script src="{% static '/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static '/js/dataTables.bootstrap4.min.js' %}"></script>
+<script>
+  $('#exampleModal').on('show.bs.modal', function (event) {
+    var button = $(event.relatedTarget) // Button that triggered the modal
+    var text1 = button.data('text1') // Extract info from data-* attributes
+    // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+    // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+    var modal = $(this) 
+    modal.find('#modal_comment').val(text1)
+  })
+</script>
+<script>
+  $('#exampleModal2').on('show.bs.modal', function (event) {
+    var button = $(event.relatedTarget) // Button that triggered the modal
+    var text1 = button.data('text1') // Extract info from data-* attributes
+    // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+    // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+    var modal = $(this) 
+    modal.find('#modal_description').val(text1)
+  })
+</script>
+<script>
+  /* Set the width of the sidebar to 250px and the left margin of the page content to 250px */
+  function openNav() {
+    document.getElementById("mySidebar").style.width = "350px";
+    document.getElementById("main").style.marginLeft = "350px";
+  }
+  
+  /* Set the width of the sidebar to 0 and the left margin of the page content to 0 */
+  function closeNav() {
+    document.getElementById("mySidebar").style.width = "0";
+    document.getElementById("main").style.marginLeft = "0";
+  }
+  </script>
+<script> 
+  function filterGlobal () {
+      $('#resultsALL').DataTable().search(
+          $('#global_filter').val(),
+          $('#global_regex').prop('checked'),
+          $('#global_smart').prop('checked')
+      ).draw();
+  }
+   
+  function filterColumn ( i ) {
+      $('#resultsALL').DataTable().column( i ).search(
+          $('#col'+i+'_filter').val(),
+          $('#col'+i+'_regex').prop('checked'),
+          $('#col'+i+'_smart').prop('checked')
+      ).draw();
+  }
+   
+  $(document).ready(function() {
+    $('#resultsALL').DataTable( {
+            "pageLength": 10,
+            "order": [[ 0, "desc" ]],
+            "lengthMenu": [ 5, 10, 25, 50, 75, 100 ],
+            "columnDefs": [
+              { "width": "20%", "targets": 8 }
+            ]
+        } );
+   
+      $('input.global_filter').on( 'keyup click', function () {
+          filterGlobal();
+      } );
+   
+      $('input.column_filter').on( 'keyup click', function () {
+          filterColumn( $(this).parents('tr').attr('data-column') );
+      } );
+  } );
+  </script>
+
+</body>
+</html>

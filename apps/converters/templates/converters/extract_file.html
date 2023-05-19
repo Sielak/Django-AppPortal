@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <title>File Extractor</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/jasny-bootstrap/4.0.0/css/jasny-bootstrap.min.css">
+    <link rel="stylesheet" href="{% static 'css/custom.css' %}">
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <div class="col-sm">
+            Environment: {{env}}
+        </div>
+        <div class="col-sm">
+            <p class="text-right">Hi, {{ request.user }}. <a href="{% url 'logout' %}">LOGOUT</a></p>
+        </div>
+    </div>
+    <div class="jumbotron">
+        <h1 class="display-4">File Extractor</h1>
+        <p class="lead">Use this application to convert orders from PDF or CSV to Excel</p>
+        <hr class="my-4">
+        <p>Usage:</p>
+        <form method="post" enctype="multipart/form-data" id="my-dropzone1">
+            {% csrf_token %}
+            <p>1.Select Company Group from below list</p>
+            <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text" for="inputGroupSelect01">Company ID</label>
+                    </div>
+                    <select class="custom-select" id="select_comp_group" name="company_group" required>
+                        {% if company_group|length == 1 %}
+                        <option value="{{company_group.0.id}}" selected>{{company_group.0.name}}</option>
+                        {% else %}
+                        <option value="" selected>Choose...</option>
+                        {% for item in company_group %}
+                        <option value="{{item.id}}">{{item.name}}</option>
+                        {% endfor %}
+                        {% endif %}
+                    </select>
+                </div>
+            <p>2. Use below input to select file with order</p>
+            <label for="test" class="dropzone">
+                <div id="dropzone">Click or drop something here</div>
+                <input id="test" name="myfile" type="file" multiple required />
+            </label>
+            <p id="filename"></p>
+            <p>3. Click GO button</p>
+            <button class='btn btn-primary' type="submit" value="file_refresh" name="Submit">GO</button>
+        </form>
+        <p>4. If you want to put Company number manually use below button</p>
+        <button id="add-option" class="btn btn-primary">Company number</button>
+        <p>5. Check all fields below if everything is ok click Download/Create Order button</p>
+        <p>6. To convert new order use below button</p>
+        <a href="{% url 'extract_file' %}" class="btn btn-primary">New File</a>
+    </div>
+    <form action="extract_file" method="post" id="create_order_form" onsubmit="return foo()">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-sm">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text" for="inputGroupSelect01">Company ID</label>
+                    </div>
+                    {% if company_count > 1 %}
+                    <select class="form-control is-invalid" id="inputGroupSelect01" name="company_id" required>
+                    {% else %}
+                    <select class="custom-select" id="inputGroupSelect01" name="company_id" required>
+                    {% endif %}
+                        {% for item in company %}
+                        <option value="{{item.0}}">{{item.0}} - {{item.1}}</option>
+                        {% endfor %}
+                    </select>
+                    {% if company_count > 1 %}
+                    <div class="invalid-feedback">
+                        There is more then 1 company with that name. Please choose one.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-sm">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="company_name">Company Name</span>
+                    </div>
+                    {% if info.company_name == 'ERROR' %}
+                    <input type="text" class="form-control is-invalid" name="company_name" id="name" aria-describedby="basic-addon3" value="{{info.company_name}}">
+                    <div class="invalid-feedback">
+                        {{info.order_number}}
+                    </div>
+                    {% else %}
+                    <input type="text" class="form-control" name="company_name" id="name" aria-describedby="basic-addon3" value="{{info.company_name}}">
+                    {% endif %}
+                    <input type="hidden" id="foretagkod" name="foretagkod" value="{{foretagkod}}">
+                    <input type="hidden" id="customer_item_numbers" name="customer_item_numbers" value="{{customer_item_numbers}}">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="order_no">Order Number</span>
+                    </div>
+                    {% if info.duplicate > 0 %}
+                    <input type="text" class="form-control is-invalid" name="order_number" id="ord_no" aria-describedby="basic-addon3" value="{{info.order_number}}">
+                    <div class="invalid-feedback">
+                        There is at least one more order existing in Jeeves for that Customer order number.
+                    </div>
+                    {% else %}
+                    <input type="text" class="form-control" name="order_number" id="ord_no" aria-describedby="basic-addon3" value="{{info.order_number}}">
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-sm">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="cust_ref">Customer Reference</span>
+                    </div>
+                    <input type="text" class="form-control" name="customer_reference" id="customer_ref"
+                           aria-describedby="basic-addon3" value="{{info.cust_ref}}">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="goods_label">Goods label</span>
+                    </div>
+                    <input type="text" class="form-control" name="goods_label" id="goods_label_row" aria-describedby="basic-addon3" value="{{info.goods_label}}">
+                </div>
+            </div>
+            <div class="col-sm">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="order_date">Order Date</span>
+                    </div>
+                    <input type="text" class="form-control" name="customer_order_date" id="ord_date" aria-describedby="basic-addon3" value="{{info.order_date}}">
+                </div>
+            </div>
+        </div>
+        {% for row in rows %}
+        <div class="row">
+            <div class="col-sm">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="item_nr">Jeeves Code</span>
+                    </div>
+                    <input type="text" class="form-control" name="item_number" id="item" aria-describedby="basic-addon3" value="{{row.item}}">
+                </div>
+            </div>
+            <div class="col-sm">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="item_qty">Item Qty</span>
+                    </div>
+                    <input type="text" class="form-control" name="item_qty" id="qty" aria-describedby="basic-addon3" value="{{row.qty}}">
+                </div>
+            </div>
+            <div class="col-sm">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="item_price">Item price</span>
+                    </div>
+                    <input type="text" class="form-control" name="item_price" id="price" aria-describedby="basic-addon3" value="{{row.price}}">
+                </div>
+            </div>
+            {% if 'pod' in row %}
+            <div class="col-sm">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="item_price">PoD</span>
+                    </div>
+                    <input type="text" class="form-control" name="item_pod" id="pod" aria-describedby="basic-addon3" value="{{row.pod}}">
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+        <input type="submit" class="btn btn-success" value="Download" name="Submit" />
+        <input type="submit" class="btn btn-danger" value="Create Order" name="Submit" id="#btncreate"/>
+        <div class="modal fade" tabindex="-1" role="dialog" id="myModal">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <div class="modal-body">
+                      <div class="d-flex align-items-center">
+                            <strong>Please wait. Creating order in Jeeves...</strong>
+                            <div class="spinner-border ml-auto" role="status" aria-hidden="true"></div>
+                        </div>
+                    </div>
+                  </div><!-- /.modal-content -->
+                </div><!-- /.modal-dialog -->
+              </div><!-- /.modal -->
+    </form>
+</div>
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+            integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+            crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+crossorigin="anonymous"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jasny-bootstrap/4.0.0/js/jasny-bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+<script>
+function foo() {
+    var $btn = $(document.activeElement);
+    //console.log($btn.val());
+    if($btn.val() != 'Download')
+        $('#myModal').modal('show');
+}
+</script>
+<script>
+    var fileInput = document.querySelector('input[type=file]');
+    var filenameContainer = document.querySelector('#filename');
+    var dropzone = document.querySelector('div[id="dropzone"]');
+
+    fileInput.addEventListener('change', function() {
+        filenameContainer.innerText = fileInput.value.split('\\').pop();
+    });
+
+    fileInput.addEventListener('dragenter', function() {
+        dropzone.classList.add('dragover');
+    });
+
+    fileInput.addEventListener('dragleave', function() {
+        dropzone.classList.remove('dragover');
+    });
+</script>
+<script>
+var addOption = document.getElementById("add-option");
+var selectField = document.getElementById("inputGroupSelect01");
+addOption.addEventListener("click", function() {
+    var item = prompt("Jeeves company number");
+    var option = document.createElement("option");
+    option.setAttribute("value", item);
+    var optionName = document.createTextNode(item);
+    option.appendChild(optionName);
+    selectField.appendChild(option);
+});
+</script>
+</body>
+</html>
+

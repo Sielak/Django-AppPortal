@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://browser.sentry-cdn.com/5.12.1/bundle.min.js"
+        integrity="sha384-y+an4eARFKvjzOivf/Z7JtMJhaN6b+lLQ5oFbBbUwZNNVir39cYtkjW1r6Xjbxg3"
+        crossorigin="anonymous"></script>
+
+    {% if sentry_event_id %}
+    <script>
+        Sentry.init({ dsn: 'https://fc6def5757c64a3bbbe1f0e670c1a6c3@sentry.io/2815328' });
+        Sentry.showReportDialog({ eventId: '{{ sentry_event_id }}' })
+    </script>
+    {% endif %}
+</head>
+
+<body>
+    <div class="container">
+    </div>
+</body>
+
+</html>

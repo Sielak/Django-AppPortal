@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <title>highlight tracker</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static 'css/custom2.css' %}">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+    <link rel="stylesheet" type="text/css" href="{% static '/css/dataTables.bootstrap4.min.css' %}">   
+</head>
+<body>
+  <!-- Modal -->
+  <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Update row</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+              <label for="modal_Subject_Group">Subject Group</label>
+              <select class="form-control" id="modal_Subject_Group" name="modal_Subject_Group">
+                {% for item in subject_group %}
+                <option>{{ item.Name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="modal_Responsible_person">Responsible person</label>
+              <input type="text" class="form-control" id="modal_Responsible_person" name="modal_Responsible_person">
+            </div>
+            <div class="form-group">
+              <label for="modal_Improvement_identified">Improvement identified</label>
+              <textarea class="form-control" id="modal_Improvement_identified" name="modal_Improvement_identified" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+              <label for="modal_Action_description">Action description</label>
+              <textarea class="form-control" id="modal_Action_description" name="modal_Action_description" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+              <label for="modal_Comments">Comments</label>
+              <textarea class="form-control" id="modal_Comments" name="modal_Comments" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+              <label for="modal_Status">Status</label>
+              <select class="form-control" id="modal_Status" name="modal_Status">
+                <option>Not Started</option>
+                <option>On going</option>
+                <option>N/A</option>
+                <option>Completed</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="modal_Completion_Date">Completion date</label>
+              <input type="date" class="form-control" id="modal_Completion_Date" name="modal_Completion_Date">
+            </div>
+            <input type="hidden" id="row_id" name="row_id" value="">
+            <input type="submit" class="btn btn-success" value="Update" name="Submit"/>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="mySidebar" class="sidebar">
+    <div class="card shadow p-3 mb-5 bg-white rounded">
+      <img class="card-img-top" src="{% static 'img/highlight.png' %}" width="300" height="150" alt="Card image cap">
+      <div class="card-body">
+          <h5 class="card-title">
+            <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">
+              <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-box-arrow-left" fill="black" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" d="M6 12.5a.5.5 0 0 0 .5.5h8a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5h-8a.5.5 0 0 0-.5.5v2a.5.5 0 0 1-1 0v-2A1.5 1.5 0 0 1 6.5 2h8A1.5 1.5 0 0 1 16 3.5v9a1.5 1.5 0 0 1-1.5 1.5h-8A1.5 1.5 0 0 1 5 12.5v-2a.5.5 0 0 1 1 0v2z"/>
+                <path fill-rule="evenodd" d="M.146 8.354a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L1.707 7.5H10.5a.5.5 0 0 1 0 1H1.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3z"/>
+              </svg>
+            </a>
+          </h5>
+          <p class="card-text">
+            <form method="post">
+              {% csrf_token %}
+              {% if user_group_list|length > 1 %}
+              <div class="form-group">
+                <label for="Group">Group</label>
+                <select class="form-control" id="Group" name="Group">
+                  {% for item in user_group_list %}
+                  <option value="{{ item.id }}">{{ item }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              {% else %}
+              <input type="hidden" id="Group" name="Group" value="{{ user_group_list.0.id }}">
+              {% endif %}
+              {% if user_area_list|length > 1 %}
+              <div class="form-group">
+                <label for="Area">Area/Function</label>
+                <select class="form-control" id="Area" name="Area">
+                  {% for item in user_area_list %}
+                  <option value="{{ item.id }}">{{ item }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              {% else %}
+              <input type="hidden" id="Area" name="Area" value="{{ user_area_list.0.id }}">
+              {% endif %}
+              {% if user_country_list|length > 1 %}
+              <div class="form-group">
+                <label for="Country">Country/Department</label>
+                <select class="form-control" id="Country" name="Country">
+                  {% for item in user_country_list %}
+                  <option value="{{ item.id }}">{{ item }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              {% else %}
+              <input type="hidden" id="Country" name="Country" value="{{ user_country_list.0.id }}">
+              {% endif %}
+              <div class="form-group">
+                <label for="Subject_Group">Subject Group</label>
+                <select class="form-control" id="Subject_Group" name="Subject_Group">
+                  {% for item in subject_group %}
+                  <option>{{ item.Name }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="Responsible_person">Responsible person</label>
+                <input type="text" class="form-control" id="Responsible_person" name="Responsible_person">
+              </div>
+              <div class="form-group">
+                <label for="Improvement_identified">Improvement identified</label>
+                <textarea class="form-control" id="Improvement_identified" name="Improvement_identified" rows="3"></textarea>
+              </div>
+              <div class="form-group">
+                <label for="Action_description">Action description</label>
+                <textarea class="form-control" id="Action_description" name="Action_description" rows="3"></textarea>
+              </div>
+              <div class="form-group">
+                <label for="Comments">Comments</label>
+                <textarea class="form-control" id="Comments" name="Comments" rows="3"></textarea>
+              </div>
+              <div class="form-group">
+                <label for="Status">Status</label>
+                <select class="form-control" id="Status" name="Status">
+                  <option>Not Started</option>
+                  <option>On going</option>
+                  <option>N/A</option>
+                  <option>Completed</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="Completion_Date">Completion date</label>
+                <input type="date" class="form-control" id="Completion_Date" name="Completion_Date">
+              </div>
+              
+              <input type="hidden" id="row_year" name="row_year" value="{{ choosed_year }}">
+              <input type="submit" class="btn btn-success" value="Add" name="Submit"/>
+            </form>
+          </p>
+        </div>
+    </div>  
+  </div>
+  <div id="main">
+    <div class="container-fluid">
+      <nav class="navbar navbar-expand-lg navbar navbar-custom">
+        <a class="navbar-brand" href="#">Highlight action plan</a>
+        <ul class="nav">
+          <li class="nav-item">
+            <div class="input-group">
+              <button class="btn btn-success" onclick="openNav()">Add new action</button>
+            </div>
+          </li>
+        </ul>
+        <ul class="navbar-nav ml-auto"> 
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Year">
+              <svg width="25" height="25" viewBox="0 0 16 16" class="bi bi-calendar-check" fill="white" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
+                <path fill-rule="evenodd" d="M10.854 7.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7.5 9.793l2.646-2.647a.5.5 0 0 1 .708 0z"/>
+              </svg>
+            </a>
+            <div class="dropdown-menu dropdown-menu-right">
+              <a class="dropdown-item" href="{% url 'main_HighlightTracker' %}?year={{ last_year }}">Last year</a>
+              <a class="dropdown-item" href="{% url 'main_HighlightTracker' %}?year={{ this_year }}">This year</a>
+            </div>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="User">
+              <svg width="25" height="25" viewBox="0 0 16 16" class="bi bi-person-circle" fill="white" xmlns="http://www.w3.org/2000/svg">
+                <path d="M13.468 12.37C12.758 11.226 11.195 10 8 10s-4.757 1.225-5.468 2.37A6.987 6.987 0 0 0 8 15a6.987 6.987 0 0 0 5.468-2.63z"/>
+                <path fill-rule="evenodd" d="M8 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+                <path fill-rule="evenodd" d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zM0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8z"/>
+              </svg>
+            </a>
+            <div class="dropdown-menu dropdown-menu-right">
+              <h6 class="dropdown-header">Hi, {{ request.user }}.</h6>  
+              <a class="dropdown-item" href="{% url 'admin:index' %}">Admin Panel</a>
+              <a class="dropdown-item" href="{% url 'logout_HighlightTracker' %}">Sign Out</a>
+            </div>
+          </li>
+          <li class="nav-item">
+            <p></p>
+          </li>
+      </ul> 
+      </nav>
+      <div class="row">
+        <div class="col">
+          <br>
+        </div>
+      </div> 
+      <div class="row">
+        <div class="col">
+          <div class="card shadow p-3 mb-5 bg-white rounded">
+            <div class="card-body">
+              <h5 class="card-title">Action List</h5>
+              <p class="card-text">
+                <table id="resultsALL" class="table table-striped table-bordered" width="100%">
+                <thead>
+                  <tr>
+                    <th>Year</th>
+                    <th>Subject Group</th>
+                    <th>Improvement identified</th>
+                    <th>Action description</th>
+                    <th>Responsible person</th>
+                    <th>Completion Data</th>
+                    <th>Action status</th>
+                    <th>Comments</th>
+                    <th>Country/Department</th>
+                    <th>Edit</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for item in action_list_data %}
+                  <tr>
+                    <td>{{ item.row_Year }}</td>
+                    <td>{{ item.Subject_Group }}</td>
+                    <td>{{ item.Improvement_Identified }}</td>
+                    <td>{{ item.Action_description }}</td>
+                    <td>{{ item.Responsible_person }}</td>
+                    <td>{{ item.Completion_Date|date:'Y-m-d' }}</td>
+                    <td>{{ item.Action_status }}</td>
+                    <td>{{ item.Comments }}</td>
+                    <td>{{ item.row_country }}</td>
+                    <td>
+                      <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#exampleModal"
+                        data-text1="{{ item.Subject_Group }}" data-text2="{{ item.Improvement_Identified }}"
+                        data-text3="{{ item.Action_description }}" data-text4="{{ item.Responsible_person }}"
+                        data-text5="{{ item.Completion_Date|date:'Y-m-d' }}" data-text6="{{ item.Action_status }}"
+                        data-text7="{{ item.Comments }}" data-text8="{{ item.id }}">
+                        Edit
+                      </button>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+<script src="{% static '/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static '/js/dataTables.bootstrap4.min.js' %}"></script>
+<script>
+/* Set the width of the sidebar to 250px and the left margin of the page content to 250px */
+function openNav() {
+  document.getElementById("mySidebar").style.width = "350px";
+  document.getElementById("main").style.marginLeft = "350px";
+}
+
+/* Set the width of the sidebar to 0 and the left margin of the page content to 0 */
+function closeNav() {
+  document.getElementById("mySidebar").style.width = "0";
+  document.getElementById("main").style.marginLeft = "0";
+}
+</script>
+<script>
+  $('#exampleModal').on('show.bs.modal', function (event) {
+    var button = $(event.relatedTarget) // Button that triggered the modal
+    var text1 = button.data('text1') // Extract info from data-* attributes
+    var text2 = button.data('text2') // Extract info from data-* attributes
+    var text3 = button.data('text3') // Extract info from data-* attributes
+    var text4 = button.data('text4') // Extract info from data-* attributes
+    var text5 = button.data('text5') // Extract info from data-* attributes
+    var text6 = button.data('text6') // Extract info from data-* attributes
+    var text7 = button.data('text7') // Extract info from data-* attributes
+    var text8 = button.data('text8') // Extract info from data-* attributes
+    // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+    // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+    var modal = $(this)
+    modal.find('#modal_Subject_Group').val(text1)
+    modal.find('#modal_Improvement_identified').val(text2)
+    modal.find('#modal_Action_description').val(text3)
+    modal.find('#modal_Responsible_person').val(text4)
+    modal.find('#modal_Completion_Date').val(text5)
+    modal.find('#modal_Status').val(text6)
+    modal.find('#modal_Comments').val(text7)
+    modal.find('#row_id').val(text8)
+  })
+  </script>
+<script>
+  $(document).ready(function() {
+      $('#resultsALL').DataTable( {
+          "pageLength": 10,
+          "order": [[ 8, "asc" ], [ 4, "asc" ]],
+          "lengthMenu": [ 5, 10, 25, 50, 75, 100 ]
+      } );
+  } );
+</script>
+</body>
+</html>

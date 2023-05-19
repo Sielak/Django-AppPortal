@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <title>Aldi orders generator</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+            integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+            integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+            crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+            integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+            crossorigin="anonymous"></script>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/jasny-bootstrap/4.0.0/css/jasny-bootstrap.min.css">
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jasny-bootstrap/4.0.0/js/jasny-bootstrap.min.js"></script>
+</head>
+<body>
+<div class="container">
+    <div class="jumbotron">
+        <h1 class="display-4">Aldi Orders</h1>
+        <p class="lead">Use this application to generate files that can be uploaded to Jeeves to create orders for
+            ALDI</p>
+        <hr class="my-4">
+        <p>Usage:</p>
+        <p>TBD</p>
+    </div>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <label class="input-group-text" for="inputGroupSelect01">Location</label>
+            </div>
+            <select class="custom-select" id="inputGroupSelect01" name="location">
+                <option value="e">English</option>
+                <option value="erh">English - Reduced height</option>
+                <option value="s">Scottish</option>
+                <option value="srh">Scottish - Reduced Height</option>
+                <option value="w">Welsh</option>
+                <option value="wrh">Welsh - Reduced Height</option>
+            </select>
+        </div>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <label class="input-group-text" for="inputGroupSelect02">Store Size</label>
+            </div>
+            <select class="custom-select" id="inputGroupSelect02" name="size">
+                <option value="850">850</option>
+                <option value="900">900</option>
+                <option value="940">940</option>
+                <option value="960">960</option>
+                <option value="990_1006">990&1006</option>
+                <option value="v2_1125_1140">V2 1125&1140</option>
+                <option value="v2_1254_1315">V2 1254&1315</option>
+            </select>
+        </div>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <label class="input-group-text" for="inputGroupSelect03">MTO/MTS</label>
+            </div>
+            <select class="custom-select" id="inputGroupSelect03" name="type">
+                <option value="MTS">MTS</option>
+                <option value="MTO">MTO</option>
+            </select>
+        </div>
+        <button class='btn btn-primary' type="submit">Download</button>
+    </form>
+</div>
+</body>
+</html>
+

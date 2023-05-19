@@ -1,0 +1,615 @@
+{% load number_formatter %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {% load static %}
+    <title>Investment Request</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="{% static '/css/dataTables.bootstrap5.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static '/css/InvestmentRequest.css' %}">
+</head>
+
+<body>
+    <!-- Modal EDIT header -->
+    {% if item_data.approval_status == 'Open' %}
+    <div class="modal fade" id="Modal_update" tabindex="-1" aria-labelledby="Modal_updateLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Request</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                    <div class="modal-body">
+                        <form method="post" id="mod_verview_form">
+                        {% csrf_token %}
+                            <div class="container-fluid">
+                                    <div class="row">
+                                        <div class="col">
+                                            <div class="form-group">
+                                                <label for="modal_update_header_investment_name">Investment name</label>
+                                                <input type="text" class="form-control" id="modal_update_header_investment_name" name="modal_update_header_investment_name" value="{{item_data.name}}" required>
+                                            </div>
+                                        </div>
+                                        <div class="col">
+                                            <div class="form-group">
+                                                <label for="modal_update_header_project_number">Project no.</label>
+                                                <input type="text" class="form-control" id="modal_update_header_project_number" name="modal_update_header_project_number" value="{{item_data.project}}" required>
+                                            </div>
+                                        </div>
+                                        <div class="col">
+                                            <div class="form-group">
+                                                <label for="modal_update_header_requested_amount">Requested amount</label>
+                                                <input type="number" class="form-control" id="modal_update_header_requested_amount" name="modal_update_header_requested_amount" step="1" value="{{item_data.requested_amount}}" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-3">
+                                        <div class="class col-4">
+                                            <div class="form-floating">
+                                                <textarea class="form-control" placeholder="why" id="modal_update_header_why" name="modal_update_header_why">{{item_data.why}}</textarea>
+                                                <label for="modal_update_header_why">Why</label>
+                                            </div>
+                                        </div>
+                                        <div class="class col-4">
+                                            <div class="form-floating">
+                                                <textarea class="form-control" placeholder="why" id="modal_update_header_what" name="modal_update_header_what">{{item_data.what}}</textarea>
+                                                <label for="modal_update_header_what">What</label>
+                                            </div>
+                                        </div>
+                                        <div class="class col-4">
+                                            <div class="form-floating">
+                                                <textarea class="form-control" placeholder="how" id="modal_update_header_how" name="modal_update_header_how">{{item_data.how}}</textarea>
+                                                <label for="modal_update_header_how">How</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-3">
+                                        <div class="class col-4">
+                                            <div class="form-floating">
+                                                <textarea class="form-control" placeholder="Alternative" id="modal_update_header_alternative" name="modal_update_header_alternative">{{item_data.alternative}}</textarea>
+                                                <label for="modal_update_header_alternative">Alternative</label>
+                                            </div>
+                                        </div>
+                                        <div class="class col-4">
+                                            <div class="form-floating">
+                                                <textarea class="form-control" placeholder="Environmental impact" id="modal_update_header_env_impact" name="modal_update_header_env_impact">{{item_data.env_impact}}</textarea>
+                                                <label for="modal_update_header_env_impact">Environmental impact</label>
+                                            </div>
+                                        </div>
+                                        <div class="class col-4">
+                                            <div class="form-group">
+                                                <label for="modal_update_header_depreciation_date">Depreciation date</label>
+                                                <input type="date" class="form-control" id="modal_update_header_depreciation_date" name="modal_update_header_depreciation_date" value="{{item_data.depreciation_date|date:'Y-m-d' }}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-3">
+                                        <div class="class col">
+                                            <div class="form-floating">
+                                                <textarea class="form-control" placeholder="Comments" id="modal_update_header_comments" name="modal_update_header_comments">{{item_data.comments}}</textarea>
+                                                <label for="modal_update_comments">Comments</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <input type="submit" form="mod_verview_form" class="btn btn-success" value="Update" name="Submit" />
+                    </div>
+            </div>
+        </div>
+    </div>    
+    {% endif %}
+    <!-- Modal files-->
+    <div class="modal fade" id="Modal_files" tabindex="-1" aria-labelledby="Modal_filesLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Attachments</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                    <div class="modal-body">
+                        <form method="post" id="upload_files" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <input class="form-control" type="file" id="formFileMultiple" name="attachments" multiple>
+                            </div>
+                        </form>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Name</th>
+                                    <th scope="col">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-file-earmark-arrow-down" viewBox="0 0 16 16">
+                                            <path d="M8.5 6.5a.5.5 0 0 0-1 0v3.793L6.354 9.146a.5.5 0 1 0-.708.708l2 2a.5.5 0 0 0 .708 0l2-2a.5.5 0 0 0-.708-.708L8.5 10.293V6.5z"/>
+                                            <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5v2z"/>
+                                        </svg>
+                                    </th>
+                                    <th scope="col">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-file-earmark-x" viewBox="0 0 16 16">
+                                            <path d="M6.854 7.146a.5.5 0 1 0-.708.708L7.293 9l-1.147 1.146a.5.5 0 0 0 .708.708L8 9.707l1.146 1.147a.5.5 0 0 0 .708-.708L8.707 9l1.147-1.146a.5.5 0 0 0-.708-.708L8 8.293 6.854 7.146z"/>
+                                            <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5v2z"/>
+                                        </svg>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {% for file in attachment_data %}
+                            <tr>
+                                <td>{{ file.name }}</td>
+                                <td>
+                                    <a href="{% static '/InvestmentRequest/' %}{{location}}/{{ file.name }}" target="_blank">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-file-earmark-arrow-down" viewBox="0 0 16 16">
+                                            <path d="M8.5 6.5a.5.5 0 0 0-1 0v3.793L6.354 9.146a.5.5 0 1 0-.708.708l2 2a.5.5 0 0 0 .708 0l2-2a.5.5 0 0 0-.708-.708L8.5 10.293V6.5z"/>
+                                            <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5v2z"/>
+                                        </svg>
+                                    </a>
+                                </td>
+                                <td>
+                                    <form method="post" class="hide-submit">
+                                        {% csrf_token %}
+                                        <input type="hidden" value="{{ file.id }}" name="file_id">
+                                        <label>
+                                            <input type="Submit" value="Delete Attachment" name="Submit"/>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="red" class="bi bi-file-earmark-x" viewBox="0 0 16 16">
+                                                <path d="M6.854 7.146a.5.5 0 1 0-.708.708L7.293 9l-1.147 1.146a.5.5 0 0 0 .708.708L8 9.707l1.146 1.147a.5.5 0 0 0 .708-.708L8.707 9l1.147-1.146a.5.5 0 0 0-.708-.708L8 8.293 6.854 7.146z"/>
+                                                <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5v2z"/>
+                                            </svg>
+                                          </label>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <input type="submit" form="upload_files" class="btn btn-success" value="Upload" name="Submit" />
+                    </div>
+            </div>
+        </div>
+    </div>
+    <div class="container-fluid">
+        <nav class="navbar navbar-expand-sm navbar-dark" style="background-color: #81a1c1">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#">Investment Request</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarText"
+                    aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarText">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                        </li>
+                    </ul>
+                    <ul class="navbar-nav ml-auto">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link" href="/InvestmentRequest/main" role="button" aria-expanded="false">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="white" class="bi bi-arrow-left-circle" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd" d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8zm15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-4.5-.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5z"/>
+                                  </svg>
+                            </a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link" href="#" role="button" aria-expanded="false" data-bs-toggle="modal" data-bs-target="#Modal_files">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="white" class="bi bi-paperclip" viewBox="0 0 16 16">
+                                    <path d="M4.5 3a2.5 2.5 0 0 1 5 0v9a1.5 1.5 0 0 1-3 0V5a.5.5 0 0 1 1 0v7a.5.5 0 0 0 1 0V3a1.5 1.5 0 1 0-3 0v9a2.5 2.5 0 0 0 5 0V5a.5.5 0 0 1 1 0v7a3.5 3.5 0 1 1-7 0V3z"/>
+                                    </svg>
+                            </a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                                <svg width="25" height="25" viewBox="0 0 16 16" class="bi bi-person-circle" fill="white" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M13.468 12.37C12.758 11.226 11.195 10 8 10s-4.757 1.225-5.468 2.37A6.987 6.987 0 0 0 8 15a6.987 6.987 0 0 0 5.468-2.63z" />
+                                    <path fill-rule="evenodd" d="M8 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" />
+                                    <path fill-rule="evenodd" d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zM0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8z" />
+                                </svg>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-end">
+                                <h6 class="dropdown-header">Hi, {{ request.user }}.</h6>
+                                <a class="dropdown-item" href="{% url 'admin:index' %}">Admin Panel</a>
+                                <a class="dropdown-item" href="{% url 'logout_InvestmentRequest' %}">Sign Out</a>
+                            </div>
+                        </li>
+                        <li class="nav-item">
+                            <p></p>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        <div class="row">
+            <div class="col">
+                <br>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col md-3">
+                <div class="card shadow p-3 mb-5 bg-white rounded">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            Overview
+                            {% if item_data.approval_status == 'Open' %}
+                            <span style="float: right;"> 
+                                <button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#Modal_update">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                                        <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                                        <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+                                      </svg>
+                                </button>
+                            </span>        
+                            {% endif %}
+                        </h5>
+                        <p class="card-text">
+                            <table class="table table-sm" style="table-layout: fixed;">
+                                <thead>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <th scope="row">Name</th>
+                                    <td>{{item_data.name}}</td>
+                                    <input type="text" hidden value="{{item_data.name}}" name="test1">
+                                </tr>
+                                <tr>
+                                    <th scope="row">Company</th>
+                                    <td>{{item_data.company.name}}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Project</th>
+                                    <td>{{item_data.project}}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Amount (SEK)</th>
+                                    <td>{{item_data.requested_amount}}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Depreciation date</th>
+                                    <td>{{item_data.depreciation_date}}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Payback Time</th>
+                                    <td>{{item_data.payback_time}}</td>
+                                </tr>
+                            </table>
+                            <table class="table table-sm caption-top" style="table-layout: fixed;">
+                                <caption>Audit trail</caption>
+                                <thead>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <th scope="row">Created by</th>
+                                        <td>{{item_data.created_by.get_full_name}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Created at</th>
+                                        <td>{{item_data.created_at|date:'Y-m-d'}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Updated by</th>
+                                        <td>{{item_data.updated_by.get_full_name}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Modified at</th>
+                                        <td>{{item_data.updated_at|date:'Y-m-d H:i'}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card shadow p-3 mb-5 bg-white rounded">
+                    <div class="card-body">
+                        <h5 class="card-title">Approvals</h5>
+                        <p class="card-text">
+                            <table class="table">
+                                <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Approval flow</th>
+                                    <th scope="col">Signature</th>
+                                    <th scope="col">Status</th>
+                                    <th scope="col">Date</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                    {% for row in approval_data %}
+                                    {% if row.name is not None and row.status != 'not_used'%}
+                                    <tr>
+                                        <th scope="row">{{ forloop.counter }}</th>
+                                        <td>{{row.desc}}</td>
+                                        <td>
+                                            {% if row.name.get_full_name == '' %}
+                                            {{row.name}}
+                                            {% else %}
+                                            {{row.name.get_full_name}}
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <form method="post" id="approval_form_{{ forloop.counter }}">
+                                                {% csrf_token %}
+                                                <div class="form-group">
+                                                    {% if row.name == request.user %}
+                                                    <select  class="form-control" id="modal_update_status_{{ forloop.counter }}" name="modal_update_status" required>
+                                                    {% else %}
+                                                    <select  class="form-control" id="modal_update_status_{{ forloop.counter }}" name="modal_update_status" disabled>
+                                                    {% endif %}
+                                                        {% if row.status is None %}
+                                                        <option value="select" selected disabled>Select status</option>
+                                                        {% else %}
+                                                        <option value="{{row.status}}" selected disabled>{{row.status}}</option>
+                                                        {% endif %}
+                                                        <option value="Approved">Approved</option>
+                                                        <option value="Reviewed">Reviewed</option>
+                                                        <option value="Rejected">Rejected</option>
+                                                    </select>
+                                                </div>
+                                                <input type="hidden" value="{{ forloop.counter }}", name="level">
+                                            </form>
+                                        </td>
+                                        <td>
+                                            {% if row.date is None %}
+                                                {% if row.name == request.user %}
+                                                <button form="approval_form_{{ forloop.counter }}" type="submit" class="btn btn-success" value="Update Approval" name="Submit">Save</button>
+                                                {% else %}
+                                                Empty
+                                                {% endif %}
+                                            {% else %}
+                                            {{ row.date }}
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endif %}
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="card shadow p-3 mb-5 bg-white rounded">
+                    <div class="card-body">
+                        <h5 class="card-title">Why</h5>
+                        <p class="card-text">
+                            {{item_data.why}}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card shadow p-3 mb-5 bg-white rounded">
+                    <div class="card-body">
+                        <h5 class="card-title">What</h5>
+                        <p class="card-text">
+                            {{item_data.what}}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card shadow p-3 mb-5 bg-white rounded">
+                    <div class="card-body">
+                        <h5 class="card-title">How</h5>
+                        <p class="card-text">
+                            {{item_data.how}}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="card shadow p-3 mb-5 bg-white rounded">
+                    <div class="card-body">
+                        <h5 class="card-title">Alternative</h5>
+                        <p class="card-text">
+                            {{item_data.alternative}}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card shadow p-3 mb-5 bg-white rounded">
+                    <div class="card-body">
+                        <h5 class="card-title">Environmental impact</h5>
+                        <p class="card-text">
+                            {{item_data.env_impact}}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card shadow p-3 mb-5 bg-white rounded">
+                    <div class="card-body">
+                        <h5 class="card-title">Comments</h5>
+                        <p class="card-text">
+                            {{item_data.comments}}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="card shadow p-3 mb-5 bg-white rounded">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            CashFlow table - test
+                            {% if item_data.approval_status == 'Open' %}
+                            <span style="float: right;">
+                                <input type="submit" form="cashflow_form" class="btn btn-success" value="Update CashFlow" name="Submit" />
+                            </span>
+                            {% endif %}
+                        </h5>
+                        <p class="card-text">
+                            <form method="post" id="cashflow_form">
+                                {% csrf_token %}
+                                <div class="container-fluid">
+                                    {% for key, value in row_data.items %}
+                                    <div class="row">
+                                        <table class="table" style="table-layout: fixed;">
+                                            <thead>
+                                            <tr>
+                                                <th scope="col">#</th>
+                                                <th scope="col">{{key}}</th>
+                                                <th scope="col">Year 1</th>
+                                                <th scope="col">Year 2</th>
+                                                <th scope="col">Year 3</th>
+                                                <th scope="col">Year 4</th>
+                                                <th scope="col">Year 5</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for row in value %}
+                                                <tr>
+                                                    <th scope="row">{{row.type_number}}</th>
+                                                    <td>{{row.type}}</td>
+                                                    <td>
+                                                        {% if item_data.approval_status == 'Open' %}
+                                                        <div class="form-group">
+                                                            <input type="number" class="form-control" id="rowID_{{row.id}}_year1" name="rowID_{{row.id}}_year1" step=".01" value="{{row.year_01}}">
+                                                        </div>
+                                                        {% else %}
+                                                            {% if row.year_01 %}
+                                                            {{row.year_01}}        
+                                                            {% endif %}
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>
+                                                        {% if item_data.approval_status == 'Open' %}
+                                                        <div class="form-group">
+                                                            <input type="number" class="form-control" id="rowID_{{row.id}}_year2" name="rowID_{{row.id}}_year2" step=".01" value="{{row.year_02}}">
+                                                        </div>
+                                                        {% else %}
+                                                            {% if row.year_02 %}
+                                                            {{row.year_02}}
+                                                            {% endif %}
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>
+                                                        {% if item_data.approval_status == 'Open' %}
+                                                        <div class="form-group">
+                                                            <input type="number" class="form-control" id="rowID_{{row.id}}_year3" name="rowID_{{row.id}}_year3" step=".01" value="{{row.year_03}}">
+                                                        </div>
+                                                        {% else %}
+                                                            {% if row.year_03 %}
+                                                            {{row.year_03}}
+                                                            {% endif %}
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>
+                                                        {% if item_data.approval_status == 'Open' %}
+                                                        <div class="form-group">
+                                                            <input type="number" class="form-control" id="rowID_{{row.id}}_year4" name="rowID_{{row.id}}_year4" step=".01" value="{{row.year_04}}">
+                                                        </div>
+                                                        {% else %}
+                                                            {% if row.year_04 %}
+                                                            {{row.year_04}}
+                                                            {% endif %}
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>
+                                                        {% if item_data.approval_status == 'Open' %}
+                                                        <div class="form-group">
+                                                            <input type="number" class="form-control" id="rowID_{{row.id}}_year5" name="rowID_{{row.id}}_year5" step=".01" value="{{row.year_05}}">
+                                                        </div>
+                                                        {% else %}
+                                                            {% if row.year_05 %}
+                                                            {{row.year_05}}
+                                                            {% endif %}
+                                                        {% endif %}
+                                                    </td>
+                                                </tr>  
+                                                {% endfor %}   
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    {% endfor %}
+                                    <div class="row">
+                                        <table class="table" style="table-layout: fixed;">
+                                            <thead>
+                                            <tr>
+                                                <th scope="col">#</th>
+                                                <th scope="col">Totals</th>
+                                                <th scope="col">Year 1</th>
+                                                <th scope="col">Year 2</th>
+                                                <th scope="col">Year 3</th>
+                                                <th scope="col">Year 4</th>
+                                                <th scope="col">Year 5</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <th scope="row"></th>
+                                                    <td>Cash Flow</td>
+                                                    <td>{{ cash_flow_data.normal.year1|intspace }}</td>
+                                                    <td>{{ cash_flow_data.normal.year2|intspace }}</td>
+                                                    <td>{{ cash_flow_data.normal.year3|intspace }}</td>
+                                                    <td>{{ cash_flow_data.normal.year4|intspace }}</td>
+                                                    <td>{{ cash_flow_data.normal.year5|intspace }}</td>
+                                                </tr>  
+                                                <tr>
+                                                    <th scope="row"></th>
+                                                    <td>Accumulated Cash Flow</td>
+                                                    <td>{{ cash_flow_data.accumulated.year1|intspace }}</td>
+                                                    <td>{{ cash_flow_data.accumulated.year2|intspace }}</td>
+                                                    <td>{{ cash_flow_data.accumulated.year3|intspace }}</td>
+                                                    <td>{{ cash_flow_data.accumulated.year4|intspace }}</td>
+                                                    <td>{{ cash_flow_data.accumulated.year5|intspace }}</td>
+                                                </tr>  
+                                            </tbody>
+                                        </table>
+                                    </div> 
+                                </div>
+                            </form>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="{% static '/js/jquery-3.5.1.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+        crossorigin="anonymous">
+    </script>
+    <script>
+        $('select[name="modal_update_status"]').children().each(
+        function (){
+            if($(this).val() == "select"){
+                $(this).css('backgroundColor','#EBCB8B');
+            }
+            if($(this).val() == "Approved"){
+                $(this).css('backgroundColor','#8FBCBB');
+            }
+            if($(this).val() == "Reviewed"){
+                $(this).css('backgroundColor','#8FBCBB');
+            }
+            if($(this).val() == "Rejected"){
+                $(this).css('backgroundColor','#BF616A');
+            }
+        }
+    );
+    $('select[name="modal_update_status"]').change(
+    function (){
+            var color = $('option:selected',this).css('background-color');
+            $(this).css('background-color',color);
+        }
+    ).change();
+    </script>
+    
+    
+    
+</body>
+
+</html>
